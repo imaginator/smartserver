@@ -1,16 +1,13 @@
-# Smartserver
+# ImagiLAN
 
-This project contains my complete automated IoT Server setup, deployable on opensuse, fedora and ubuntu.
+(forked from https://github.com/HolgerHees/smartserver)
 
-For a detailed overview about installed software and services check
+Infrastructure and Server Automation
 
-* [http://www.intranet-of-things.com/smarthome/infrastructure/server/setup/](http://www.intranet-of-things.com/smarthome/infrastructure/server/setup/) 
-* or the main deployment [server.yml](https://github.com/HolgerHees/smartserver/blob/master/server.yml) file
+## Build Infrastructure
 
-For a detailed description about the main features and a lot more, check [the wiki](https://github.com/HolgerHees/smartserver/wiki)
+`ansible-playbook  -i config/bunker/inventory.yml   infrastructure.yml  --diff` 
 
-## Demo setup
+## Deploy services
 
-To try this smartserver deployment, just 3 steps are needed. Install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) and run the deployment script.
-
-A detailed explaination can be found in the [How to start](https://github.com/HolgerHees/smartserver/wiki/Setup) wiki section
+`ansible-playbook  -i config/bunker/inventory.yml   services.yml  --diff`
