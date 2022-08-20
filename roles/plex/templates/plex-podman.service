@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --volume /var/lib/plex/data:/data \
   --volume /var/lib/plex/database:/config \
   --volume /var/tmp/plex/transocde:/transcode \
-  dir:/tmp/plex-image
+  docker.io/plexinc/pms-docker
 ExecStop=/usr/bin/podman stop -t 10 plex
 ExecStopPost=-/usr/bin/podman rm --ignore -f plex
 
