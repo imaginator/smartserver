@@ -1,0 +1,28 @@
+[Unit]
+Description=Plex in Podman                                                                            
+Documentation=man:podman-generate-systemd(1)                                                                          
+Wants=network-online.target                                                                                           
+After=network-online.target                                                                                           
+
+[Service]
+Restart=on-failure
+TimeoutStopSec=70
+User=plex
+Group=plex
+ExecStart=/usr/bin/podman run \
+  --name=plex \
+  --log-level=error \
+  --publish 32400:32400 \
+  --sdnotify=conmon \
+  -e TZ=Europe/Berlin \
+  --volume /srv/video/TV:/media/tv:ro \
+  --volume /srv/video/Film:/media/film:ro \
+  --volume /var/lib/plex/data:/data \
+  --volume /var/lib/plex/database:/config \
+  --volume /var/tmp/plex/transocde:/transcode \
+  dir:/tmp/plex-image
+ExecStop=/usr/bin/podman stop -t 10 plex
+ExecStopPost=-/usr/bin/podman rm --ignore -f plex
+
+[Install]
+WantedBy=default.target

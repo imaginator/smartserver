@@ -1,0 +1,53 @@
+---
+
+- name: Install podman
+  package:
+    name:
+      - podman
+    state: present
+
+- name: Create plex group
+  ansible.builtin.group:
+    name: plex
+    state: present
+
+- name: Create plex user
+  user:
+    name: plex
+    groups: plex
+    system: true
+    createhome: false
+    shell: /bin/false
+    state: present
+
+- name: Creates plex directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: plex
+    group: plex
+  with_items:
+  - /var/lib/plex/database
+  - /var/lib/plex/data
+  - /var/tmp/plex/transocde
+
+- name: Open plex firewall port
+  firewalld:
+    zone: trusted
+    port: 32400/tcp
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: Create plex-podman systemd service file
+  template:
+    src: plex-podman.service
+    dest: /lib/systemd/system/plex-podman.service
+
+- name: Start the plex-podman container
+  become: true
+  service:
+    name: 'plex-podman'
+    enabled: yes
+    state: 'restarted'
+    daemon_reload: yes
