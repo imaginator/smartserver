@@ -1,5 +1,8 @@
 ---
 
+# only accessible via plex.imaginator.com
+# https://github.com/toomuchio/plex-nginx-reverseproxy
+
 - name: Install podman
   package:
     name:
@@ -31,18 +34,16 @@
   - /var/lib/plex/data
   - /var/tmp/plex/transocde
 
-- name: Open plex firewall port
-  firewalld:
-    zone: trusted
-    port: 32400/tcp
-    permanent: true
-    state: enabled
-    immediate: true
-
 - name: Create plex-podman systemd service file
   template:
     src: plex-podman.service
     dest: /lib/systemd/system/plex-podman.service
+
+- name: Create plex-podman nginx vhost
+  template:
+    src: plex.imaginator.com.conf
+    dest: /etc/nginx/sites-enabled/plex.imaginator.com.conf
+  notify: reload nginx
 
 - name: Start the plex-podman container
   become: true
