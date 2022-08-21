@@ -1,5 +1,5 @@
 ---
 
-- include: plex.yml
+- import_tasks: plex.yml
   tags:
   - plex
