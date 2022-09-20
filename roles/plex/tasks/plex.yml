@@ -38,17 +38,10 @@
   template:
     src: plex-podman.service
     dest: /lib/systemd/system/plex-podman.service
+  notify: restart plex-podman
 
 - name: Create plex-podman nginx vhost
   template:
     src: plex.imaginator.com.conf
     dest: /etc/nginx/sites-enabled/plex.imaginator.com.conf
   notify: reload nginx
-
-- name: Start the plex-podman container
-  become: true
-  service:
-    name: 'plex-podman'
-    enabled: yes
-    state: 'restarted'
-    daemon_reload: yes

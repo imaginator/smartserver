@@ -17,7 +17,10 @@ ExecStart=/usr/bin/podman run \
   -e TZ=Europe/Berlin \
   --volume /srv/video/TV:/media/tv:ro \
   --volume /srv/video/Film:/media/film:ro \
+  --volume /srv/audio/audiobooks/:/media/audiobooks:ro \
+  --volume /srv/photos/:/media/photos:ro \
   --volume /var/lib/plex/data:/data \
+   -e PLEX_CLAIM="claim-Aifrk1Ld1bqUBJC3fzQF" \
   --volume /var/lib/plex/database:/config \
   --volume /var/tmp/plex/transocde:/transcode \
   docker.io/plexinc/pms-docker
@@ -26,3 +29,10 @@ ExecStopPost=-/usr/bin/podman rm --ignore -f plex
 
 [Install]
 WantedBy=default.target
+
+# for claiming  (https://www.plex.tv/claim/)
+#  -e PLEX_CLAIM="claim-zzzzzzzzzzzzzzzzzz" \
+
+#  --mount=type=bind,\"src=/run/user/7300/gvfs/smb-share:server=srvr.company.com,share=datafldr\",target=/datatargetfldr \
+#  --volume \"/srv/video/Plex Versions\":\"/media/tv/Plex Versions\":rw \
+#   --volume "/srv/video/Plex Versions:/media/tv/Plex\040Versions":rw \

@@ -4,3 +4,10 @@
   service: 
     name: nginx
     state: reloaded
+
+- name: restart plex-podman
+  service:
+    name: plex-podman
+    enabled: yes
+    state: restarted
+    daemon_reload: yes
