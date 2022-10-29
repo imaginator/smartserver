@@ -1,0 +1,9 @@
+---
+- hosts: bunker.imagilan
+  become: true
+  become_user: root
+  vars_files:
+    - config/bunker/env.yml
+  tasks:
+    - { name: fstab, ansible.builtin.import_role: { name: fstab }, tags: ['fstab'] }
+    - { name: plex, ansible.builtin.import_role: { name: plex }, tags: ['plex'] }

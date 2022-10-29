@@ -1,0 +1,30 @@
+---
+- name: add cryptab entries
+  community.general.crypttab:
+    name: "{{ item.key }}"
+    backing_device: "UUID={{ item.value }}"
+    opts: "luks"
+    state: present
+  loop: "{{ lookup('ansible.builtin.dict', cryptdisks) }}"
+  notify:
+    - crypttab changes
+
+- name: create mountpoints
+  ansible.builtin.file:
+    path: "{{ item.key }}"
+    state: directory
+    mode: 0775
+    owner: root
+    group: root
+  loop: "{{ lookup('ansible.builtin.dict', mountpoints) }}"
+
+- name: add mounts to fstab
+  ansible.posix.mount:
+    path: "{{ item.key }}"
+    src: "UUID={{ item.value.disk_uuid }}"
+    fstype: btrfs
+    opts: defaults,noatime,subvol={{ item.value.subvolume }}
+    state: present
+  loop: "{{ lookup('ansible.builtin.dict', mountpoints) }}"
+  notify:
+    - fstab changes

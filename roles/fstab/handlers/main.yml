@@ -1,0 +1,15 @@
+---
+- name: systemd-cryptsetup-generator
+  listen: crypttab changes
+  ansible.builtin.command:
+    cmd: /lib/systemd/system-generators/systemd-cryptsetup-generator
+
+# optionally manually unlock with
+# systemctl restart cryptsetup.target
+
+- name: remount fstab entries
+  listen: fstabtab changes
+  ansible.builtin.service:
+    name: local-fs.target
+    state: restarted
+    daemon_reload: true
