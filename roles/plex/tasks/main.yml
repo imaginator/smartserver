@@ -1,5 +1,70 @@
 ---
+# only accessible via plex.imaginator.com
+# https://github.com/toomuchio/plex-nginx-reverseproxy
 
-- import_tasks: plex.yml
-  tags:
-  - plex
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - podman
+    state: present
+
+- name: create plex group
+  ansible.builtin.group:
+    name: plex
+    state: present
+
+- name: ensure media group exists
+  ansible.builtin.group:
+    name: media
+    state: present
+
+- name: create plex user
+  ansible.builtin.user:
+    name: plex
+    group: plex
+    system: true
+    home: /var/lib/plex
+    groups: media
+    createhome: true
+    shell: /bin/false
+    state: present
+
+- name: creates plex directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: plex
+    group: plex
+    mode: 0775
+  with_items:
+    - /var/lib/plex/database
+    - /var/lib/plex/data
+    - /var/tmp/plex/transcode
+
+- name: update plex image
+  containers.podman.podman_image:
+    name: docker.io/plexinc/pms-docker
+    pull: true
+    state: present
+
+# needs /etc/sub[ug]id of
+# simon:100000:65536
+# plex:165536:65536
+
+- name: Create plex-podman systemd service file
+  ansible.builtin.template:
+    src: plex-podman.service
+    dest: /lib/systemd/system/plex-podman.service
+    owner: root
+    group: root
+    mode: 0664
+  notify: restart plex-podman
+
+- name: Create plex-podman nginx vhost
+  ansible.builtin.template:
+    src: plex.imaginator.com.conf
+    dest: /etc/nginx/sites-enabled/plex.imaginator.com.conf
+    owner: root
+    group: root
+    mode: 0660
+  notify: reload nginx

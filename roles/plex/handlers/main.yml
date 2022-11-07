@@ -1,13 +1,13 @@
 ---
 
 - name: reload nginx
-  service: 
+  ansible.builtin.service:
     name: nginx
     state: reloaded
 
 - name: restart plex-podman
-  service:
+  ansible.builtin.service:
     name: plex-podman
-    enabled: yes
+    enabled: true
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
