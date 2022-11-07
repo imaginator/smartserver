@@ -1,0 +1,17 @@
+---
+- name: install samba
+  ansible.builtin.package:
+    name:
+      - smbclient
+      - samba
+    state: present
+
+- name: snapper configs
+  ansible.builtin.template:
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0664
+    src: samba-template.j2
+  notify:
+    - samba changes

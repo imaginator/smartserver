@@ -1,0 +1,7 @@
+---
+
+- name: samba changes
+  listen: samba changes
+  ansible.builtin.service:
+    name: smbd
+    state: restarted
