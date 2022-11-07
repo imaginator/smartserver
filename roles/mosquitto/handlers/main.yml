@@ -1,0 +1,7 @@
+---
+
+- name: mosquitto changes
+  listen: mosquitto changes
+  ansible.builtin.service:
+    name: mosquitto
+    state: restarted

@@ -1,0 +1,16 @@
+---
+- name: install mosquitto
+  ansible.builtin.package:
+    name:
+      - mosquitto
+    state: present
+
+- name: mosquitto config
+  ansible.builtin.template:
+    dest: /etc/mosquitto/mosquitto.conf
+    owner: root
+    group: root
+    mode: 0664
+    src: mosquitto.conf.j2
+  notify:
+    - mosquitto changes
