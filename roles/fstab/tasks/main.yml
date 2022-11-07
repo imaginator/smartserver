@@ -1,4 +1,11 @@
 ---
+- name: install filesystem utils
+  ansible.builtin.package:
+    name:
+      - snapper
+      - btrfs-progs
+    state: present
+
 - name: add cryptab entries
   community.general.crypttab:
     name: "{{ item.key }}"
@@ -28,3 +35,23 @@
   loop: "{{ lookup('ansible.builtin.dict', mountpoints) }}"
   notify:
     - fstab changes
+
+- name: snapper configs
+  ansible.builtin.template:
+    dest: /etc/snapper/configs/{{ item.value.subvolume | regex_replace('^@' ) }}
+    owner: root
+    group: root
+    mode: 0664
+    src: snapper-template.j2
+  loop: "{{ lookup('ansible.builtin.dict', mountpoints) }}"
+  notify:
+    - snapper changes
+
+- name: create snapper configs
+  ansible.builtin.command: snapper -c {{ item.value.subvolume | regex_replace('^@' ) }} create-config {{ item.key }}
+  args:
+    creates: /etc/snapper/configs/{{ item.value.subvolume | regex_replace('^@' ) }}
+  loop: "{{ lookup('ansible.builtin.dict', mountpoints) }}"
+  notify:
+    - snapper changes
+    
