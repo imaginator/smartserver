@@ -1,0 +1,11 @@
+---
+- name: homeassistant changes
+  ansible.builtin.service:
+    name: homeassistant
+    state: restarted
+    daemon_reload: true
+
+- name: nginx changes
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded

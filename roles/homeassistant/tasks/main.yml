@@ -1,0 +1,60 @@
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - podman
+    state: present
+
+- name: create homeassistant group
+  ansible.builtin.group:
+    name: homeassistant
+    state: present
+
+- name: create homeassistant user
+  ansible.builtin.user:
+    name: homeassistant
+    group: homeassistant
+    system: true
+    home: /var/lib/homeassistant
+    groups: media
+    createhome: true
+    shell: /bin/false
+    state: present
+
+- name: creates homeassistant directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: homeassistant
+    group: homeassistant
+    mode: 0775
+  with_items:
+    - /var/lib/homeassistant
+    - /var/lib/podman-services/homeassistant
+
+# needs /etc/sub[ug]id of
+# simon:100000:65536
+# plex:165536:65536
+# homeassistant:231072:65536
+# next 296608:...
+# next 362144:...
+# next  427680:...
+# usermod --add-subuids 362144-296607 --add-subgids  231072-296607 homeassistant
+# usermod --add-subuids 296608-362144 --add-subgids   296608-362144 transmision-daemon
+
+- name: Create homeassistant-podman systemd service file
+  ansible.builtin.template:
+    src: homeassistant.service
+    dest: /lib/systemd/system/homeassistant.service
+    owner: root
+    group: root
+    mode: 0664
+  notify: homeassistant changes
+
+- name: Create ha.imagilan nginx vhost
+  ansible.builtin.template:
+    src: ha.imagilan.conf
+    dest: /etc/nginx/sites-enabled/ha.imagilan.conf
+    owner: www-data
+    group: www-data
+    mode: 0660
+  notify: nginx changes
