@@ -3,8 +3,8 @@ set -x
 
 export room=$1
 
-if [[ $(echo "$room" | grep -LE 'Kitchen|Lounge|Study|HallwayLarge|BathroomMain|BathroomGuest|Bedroom1|Bedroom2|Bedroom3') ]]; then 
-  echo "Missing room parameter incorrectly capitalised e.g Lounge"
+if [[ $(echo "$room" | grep -LE 'kitchen|lounge|study|hallwaylarge|bathroommain|bathroomguest|bedroom1|bedroom2|bedroom3') ]]; then 
+  echo "Missing room parameter"
   exit 1
 fi
 
@@ -14,13 +14,21 @@ echo "running ADB non-root commands"
 adb kill-server
 adb connect tablet-$room.imagilan:5555 && sleep 2
 
+if [[ ! -f /tmp/WallPanelApp-prod-universal-release.apk ]] ; then
+  curl -L -o /tmp/WallPanelApp-prod-universal-release.apk https://github.com/TheTimeWalker/wallpanel-android/releases/download/v0.10.4/WallPanelApp-prod-universal-release.apk
+fi
+
+adb shell am force-stop                 xyz.wallpanel.app                                                #since disable doesn't kill
+#adb uninstall                           xyz.wallpanel.app
+#adb install -r                          /tmp/WallPanelApp-prod-universal-release.apk
+adb shell dumpsys deviceidle whitelist +xyz.wallpanel.app   
+
 adb shell appops set android TOAST_WINDOW deny                                              # this would deny all toasts from Android System
 adb shell setprop persist.adb.tcp.port 5555                                                 # keep adb via wifi enabled
 adb shell setprop persist.sys.timezone Europe/Berlin
 adb shell settings put global stay_on_while_plugged_in 3
 adb shell settings put global bluetooth_on 0
 adb shell settings put global wifi_on 1
-adb shell settings put wifi_sleep_policy_never 1
 adb shell settings put global wifi_sleep_policy 2
 adb shell settings put system accelerometer_rotation 1
 adb shell settings put system screen_brightness_mode 0                                      # auto brightness mode
@@ -32,26 +40,15 @@ adb shell settings put system volume_system 0
 adb shell svc power stayon true
 adb shell svc wifi enable
 
-if [[ ! -f /tmp/WallPanelApp-prod-universal-release.apk ]] ; then
-  curl -L -o /tmp/WallPanelApp-prod-universal-release.apk https://github.com/TheTimeWalker/wallpanel-android/releases/download/v0.10.4/WallPanelApp-prod-universal-release.apk
-fi
-
-#adb uninstall                           org.openhab.habdroid.beta
-#adb uninstall                           de.vier_bier.habpanelviewer
-
-adb shell am force-stop                 xyz.wallpanel.app                                                #since disable doesn't kill
-adb uninstall                           xyz.wallpanel.app
-adb install -r                     /tmp/org.openhab.habdroid.apk
-adb shell dumpsys deviceidle whitelist +xyz.wallpanel.app   
-adb shell pm grant                      xyz.wallpanel.app android.permission.ACCESS_FINE_LOCATION
-
 # needed to write to /data
 echo "running ADB root commands"   
 adb root &&  adb connect tablet-$room.imagilan:5555 && sleep 2
 
 # add prefs
+envsubst '$room' < ../templates/xyz.wallpanel.app_preferences.xml > /tmp/xyz.wallpanel.app_preferences.xml
+
 adb shell mkdir -m 777 -p                                        /data/data/xyz.wallpanel.app/shared_prefs
-adb push  ../templates/xyz.wallpanel.app_preferences.xml         /data/data/xyz.wallpanel.app/shared_prefs/xyz.wallpanel.app_preferences.xml
+adb push  /tmp/xyz.wallpanel.app_preferences.xml                 /data/data/xyz.wallpanel.app/shared_prefs/xyz.wallpanel.app_preferences.xml
 adb shell chmod -R 777                                           /data/data/xyz.wallpanel.app/shared_prefs
 
 # Disable lock screen
@@ -80,15 +77,12 @@ adb shell pm disable org.lineageos.recorder
 
 # on 
 adb unroot && sleep 2
-# adb shell am start -n                  xyz.wallpanel.app/org.openhab.habdroid.ui.MainActivity
-adb shell am start -n                   xyz.wallpanel.app/.ui.LauncherActivityAlias
-adb shell cmd package set-home-activity xyz.wallpanel.app/.ui.LauncherActivityAlias
+
+# Dumps the information about every activity that is shown in the launcher (i.e., has the launcher intent).
+# adb shell "cmd package query-activities -a android.intent.action.MAIN -c android.intent.category.LAUNCHER"
+
+adb shell am start -n                   xyz.wallpanel.app/.ui.activities.BrowserActivityNative
+adb shell cmd package set-home-activity xyz.wallpanel.app/.ui.activities.BrowserActivityNative
 
 #adb reboot
 adb disconnect tablet-$room.imagilan
-
-#adb shell cmd package set-home-activity "xyz.wallpanel.app/.ui.LauncherActivityAlias" -user --user 0
-
-
-
-#PackageManager: Adding preferred activity xyz.wallpanel.app/.ui.LauncherActivityAlias
