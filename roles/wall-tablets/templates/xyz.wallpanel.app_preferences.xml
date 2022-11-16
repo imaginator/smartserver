@@ -5,7 +5,7 @@
     <boolean name="hadware_accelerated_enabled" value="true" />
     <boolean name="pref_browser_refresh_disconnect" value="true" />
     <boolean name="pref_browser_settings_updated" value="false" />
-    <boolean name="pref_camera_permissions" value="true" />
+    <boolean name="pref_camera_permissions" value="false" />
     <boolean name="pref_dark_theme" value="true" />
     <boolean name="pref_setting_camera_enabled" value="false" />
     <boolean name="pref_settings_button_disable" value="false" />
@@ -22,7 +22,7 @@
     <boolean name="setting_app_preventsleep" value="true" />
     <boolean name="setting_app_showactivity" value="true" />
     <boolean name="setting_camera_enabled" value="false" />
-    <boolean name="setting_http_enabled" value="true" />
+    <boolean name="setting_http_enabled" value="false" />
     <boolean name="setting_http_mjpegenabled" value="false" />
     <boolean name="setting_ignore_ssl_errors" value="false" />
     <boolean name="setting_mqtt_discovery" value="true" />
@@ -33,29 +33,25 @@
     <boolean name="settings_screensaver_web" value="true" />
     <boolean name="settings_screensaver" value="false" />
     <boolean name="settings_wallpaper_screensaver" value="false" />
-    <int name="screensaver_dim_value" value="50" />
-    <int name="setting_screen_brightness" value="192" />
+    <int name="screensaver_dim_value" value="99" />
+    <int name="setting_screen_brightness" value="128" />
     <int name="setting_screensaver_brightness" value="2" />
-    <string name="key_setting_camera_cameraid">0</string>
     <string name="pref_mqtt_version">5.0</string>
-    <string name="pref_screensaver_dim_value">80</string>
-    <string name="pref_screensaver_inactivity_time">30000</string>
+    <string name="pref_screensaver_dim_value">99</string>
+    <string name="pref_screensaver_inactivity_time">15000</string>
     <string name="pref_setting_camera_rotate">0F</string>
     <string name="pref_settings_button_location">0</string>
     <string name="pref_settings_dashboard_url">http://ha.imagilan/</string>
     <string name="pref_settings_image_rotation">15</string>
     <string name="pref_settings_user_agent"></string>
-    <string name="pref_web_screensaver_url">https://photos.google.com/share/AF1QipNarSB43tDGe3ivGbFvu9Yjr9gVPmlCs8uusduXN4kDz6_Qg0qs-USq-xvOjRuG1Q/photo/AF1QipOgyuY1UZL1uSu0i0cCixyc9gWrY-qhtj5d0A8j?key=R183R0VhSk41Y2JkRFhvVjJ5WGRJeV92bUl1LURB</string>
-    <string name="setting_app_launchurl">http://ha.imagilan/</string>
-    <string name="setting_camera_fps">15</string>
-    <string name="setting_http_mjpegmaxstreams">1</string>
-    <string name="setting_http_port">2971</string>
+    <string name="pref_web_screensaver_url">http://ha.imagilan/web-screensaver/</string>
+    <string name="setting_app_launchurl">http://ha.imagilan/rooms-dashboard/${room}</string>
     <string name="setting_mqtt_basetopic">wallpanel/${room}/</string>
     <string name="setting_mqtt_clientid">${room}</string>
-    <string name="setting_mqtt_discovery_name">${room}</string>
+    <string name="setting_mqtt_discovery_name">tablet_${room}</string>
     <string name="setting_mqtt_discovery_topic">homeassistant</string>
     <string name="setting_mqtt_password"></string>
-    <string name="setting_mqtt_sensorfrequency">60</string>
+    <string name="setting_mqtt_sensorfrequency">15</string>
     <string name="setting_mqtt_servername">10.7.11.10</string>
     <string name="setting_mqtt_serverport">1883</string>
     <string name="setting_mqtt_username"></string>
