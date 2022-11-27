@@ -1,0 +1,123 @@
+---
+- name: Install the latest version of firewalld
+  ansible.builtin.package:
+    name:
+      - firewalld
+
+# no ansible way to set the default zone so:
+- name: Set dmz as default policy
+  ansible.builtin.command: firewall-cmd --set-default-zone=drop
+
+# trusted zone (trusted) => trusted zone
+
+- name: firewalld setup trusted zone
+  ansible.posix.firewalld:
+    zone: trusted
+    interface: trusted
+    permanent: true
+    state: enabled
+    immediate: true
+
+# trusted rules
+
+- name: firewalld ssh
+  ansible.posix.firewalld:
+    zone: trusted
+    service: ssh
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld dhcpv6-client
+  ansible.posix.firewalld:
+    zone: trusted
+    service: dhcpv6-client
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld http
+  firewalld:
+    zone: trusted
+    service: http
+    permanent: true
+    state: enabled
+    immediate: true
+
+# untrusted zone (notrust + iot) => drop zone
+
+- name: firewalld setup untrusted zone
+  ansible.posix.firewalld:
+    zone: drop
+    interface:
+      - notrust
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld setup untrusted zone
+  ansible.posix.firewalld:
+    zone: drop
+    interface:
+      - iot
+    permanent: true
+    state: enabled
+    immediate: true
+
+# untrusted rules
+
+- name: firewalld ssh
+  ansible.posix.firewalld:
+    zone: drop
+    service: ssh
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld dhcpv6-client
+  firewalld:
+    zone: drop
+    service: dhcpv6-client
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld http
+  firewalld:
+    zone: drop
+    service: http
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld syslog from freifunk hosts
+  firewalld:
+    zone: drop
+    service: syslog
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld enable torrents tcp
+  firewalld:
+    zone: drop
+    port: 51413/tcp
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld enable torrents udp
+  firewalld:
+    zone: drop
+    port: 51413/udp
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: firewalld replies back from 224.0.23.12 (KNX)
+  firewalld:
+    zone: drop
+    port: 3671/udp
+    permanent: true
+    state: enabled
+    immediate: true
