@@ -6,4 +6,11 @@
     - config/bunker/env.yml
   tasks:
     - { name: fstab, ansible.builtin.import_role: { name: fstab }, tags: ['fstab'] }
+    - { name: media, ansible.builtin.import_role: { name: media }, tags: ['media'] }
+    - { name: mosquitto, ansible.builtin.import_role: { name: mosquitto }, tags: ['mosquitto'] }
+    - { name: mysql, ansible.builtin.import_role: { name: mysql }, tags: ['mysql'] }
+    - { name: samba, ansible.builtin.import_role: { name: samba }, tags: ['samba'] }
+    - { name: nginx, ansible.builtin.import_role: { name: nginx }, tags: ['nginx'] }
+    - { name: transmission, ansible.builtin.import_role: { name: transmission }, tags: ['transmission'] }
     - { name: plex, ansible.builtin.import_role: { name: plex }, tags: ['plex'] }
+    - { name: homeassistant, ansible.builtin.import_role: { name: homeassistant }, tags: ['homeassistant'] }
