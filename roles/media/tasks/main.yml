@@ -1,0 +1,5 @@
+---
+- name: ensure media group exists
+  ansible.builtin.group:
+    name: media
+    state: present
