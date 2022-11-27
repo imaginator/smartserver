@@ -64,7 +64,7 @@
   ansible.builtin.template:
     src: plex.imaginator.com.conf
     dest: /etc/nginx/sites-enabled/plex.imaginator.com.conf
-    owner: root
-    group: root
+    owner: www-data
+    group: www-data
     mode: 0660
   notify: reload nginx
