@@ -2,6 +2,7 @@
   ansible.builtin.package:
     name:
       - podman
+      - nginx-extras
     state: present
 
 - name: create homeassistant group
@@ -49,6 +50,30 @@
     group: root
     mode: 0664
   notify: homeassistant changes
+
+- name: random_picture dir
+  ansible.builtin.file:
+    state: directory
+    path: /var/lib/homeassistant/screensaver_pictures
+    owner: simon
+    group: simon
+    mode: 0775
+
+- name: create screensaver web root dir
+  ansible.builtin.file:
+    state: directory
+    path: /var/lib/homeassistant/screensaver_root
+    owner: www-data
+    group: www-data
+    mode: 0775
+
+- name: web_screensaver index file
+  ansible.builtin.template:
+    src: index.html
+    dest: /var/lib/homeassistant/screensaver_root/index.html
+    owner: www-data
+    group: www-data
+    mode: 0775
 
 - name: Create ha.imagilan nginx vhost
   ansible.builtin.template:
