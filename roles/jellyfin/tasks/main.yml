@@ -1,0 +1,27 @@
+---
+- name: Install Jellyfin
+  include_tasks: install.yml
+
+- name: Generate self signed SSL certificate
+  include_role:
+    name: hadrienpatte.self_signed_certificate
+  vars:
+    self_signed_certificate_FQDN: "{{ jellyfin_FQDN }}"
+    self_signed_certificate_key_path: "{{ jellyfin_certificate_path }}"
+    self_signed_certificate_path: "{{ jellyfin_certificate_path }}"
+  when: jellyfin_generate_self_signed_certificate
+
+- name: Configure {{ jellyfin_HTTP_server }}
+  include_tasks: HTTP_server.yml
+
+- name: Install and configure certbot
+  include_tasks: certbot.yml
+  when: jellyfin_letsencrypt
+
+- name: Reconfigure {{ jellyfin_HTTP_server }}
+  include_tasks: HTTP_server.yml
+  when: jellyfin_letsencrypt
+
+- name: Configure Jellyfin
+  include_tasks: configure.yml
+...

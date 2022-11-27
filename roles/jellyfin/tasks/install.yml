@@ -1,0 +1,16 @@
+---
+
+  - name: installing podman
+    package:
+      name: "podman"
+      state: present
+
+  - name: Pull an image
+    containers.podman.podman_image:
+      name:  docker.io/jellyfin/jellyfin:latest
+
+  - name: Jellyfin Systemd unit file
+    template: src=jellyfin.service.j2 dest=/lib/systemd/system/jellyfin.service mode=644
+    notify:
+      - "systemd daemon-reload"
+      - "restart jellyfin"

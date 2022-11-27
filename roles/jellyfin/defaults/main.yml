@@ -1,0 +1,13 @@
+---
+jellyfin_HTTP_port: 8096
+jellyfin_HTTPS_port: 8920
+jellyfin_FQDN:
+  - jellyfin.imaginator.com
+jellyfin_HTTP_server: nginx
+jellyfin_certificate_path: /etc/ssl/private/{{ jellyfin_FQDN | first }}
+jellyfin_generate_self_signed_certificate: true
+jellyfin_redirect_HTTPS: true
+jellyfin_letsencrypt: true
+jellyfin_letsencrypt_email: admin@{{ jellyfin_FQDN | first }}
+jellyfin_remove_default: false
+...
