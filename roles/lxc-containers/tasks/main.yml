@@ -1,11 +1,11 @@
-- name: apt lxc packages are installed on host
-  apt: name={{ item }}
-  with_items:
-  - lxc
-  - lxctl
-  - lxc-dev
-  - lxc-templates
-
+- name: lxc packages are installed on host
+  apt:
+    pkg:
+    - lxc
+    - lxctl
+    - lxc-dev
+    - lxc-templates
+  
 - copy:
     dest: /etc/default/lxc-net
     content: |
@@ -14,7 +14,8 @@
 - copy:
     dest: /etc/lxc/default.conf
     content: |
-      lxc.net.0.type = veth
+      lxc.net.0.type = macvlan
+      lxc.net.0.macvlan.mode = bridge
       lxc.net.0.link = {{ lxc_bridge_interface }}
       lxc.net.0.flags = up
       lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
@@ -36,18 +37,21 @@
   lxc_container:
     name: "{{ item }}"
     container_log: true
+    container_log_level: debug
     template: ubuntu
     state: started
     template_options: --release jammy
     container_config:
-      - "lxc.start.auto = 1"
-      - "lxc.net.0.flags = up"
-      - "lxc.net.0.link = {{ lxc_bridge_interface }}"
       - "lxc.net.0.ipv4.address = {{ hostvars[item].ansible_host }}/24"
       - "lxc.net.0.ipv4.gateway = auto"
-    container_command: |
-        if [ ! -d ~/.ssh ]; then
-          mkdir ~/.ssh
-          echo "{{ lookup('file', my_ssh_key) }}" | tee -a ~/.ssh/authorized_keys
-        fi
+      - "lxc.net.0.link = {{ lxc_bridge_interface }}"
+      - "lxc.net.0.macvlan.mode = bridge"
+      - "lxc.net.0.type = macvlan"
+      - "lxc.start.auto = 1"
+      - "lxc.uts.name = {{ item }}"
+#    container_command: |
+#        if [ ! -d ~/.ssh ]; then
+#          mkdir ~/.ssh
+#          echo "{{ lookup('file', my_ssh_key) }}" | tee -a ~/.ssh/authorized_keys
+#        fi
   loop: "{{ query('inventory_hostnames', 'lxc_containers') }}"
