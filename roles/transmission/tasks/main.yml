@@ -1,0 +1,32 @@
+---
+- name: install transmission
+  ansible.builtin.package:
+    name:
+      - transmission-daemon
+    state: present
+
+- name: adding transmission-daemon to group media
+  ansible.builtin.user:
+    name: transmission-daemon
+    groups: media
+    append: true
+
+- name: transmission configs
+  ansible.builtin.template:
+    dest: /etc/transmission-daemon/settings.json
+    owner: root
+    group: root
+    mode: 0664
+    src: settings.json
+  notify:
+    - transmission changes
+
+- name: Create transmission nginx vhost
+  ansible.builtin.template:
+    src: transmission.imagilan.conf
+    dest: /etc/nginx/sites-enabled/transmission.imagilan.conf
+    owner: www-data
+    group: www-data
+    mode: 0660
+  notify:
+    - reload nginx

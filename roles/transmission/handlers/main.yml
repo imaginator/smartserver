@@ -1,0 +1,12 @@
+---
+- name: transmission changes
+  listen: transmission changes
+  ansible.builtin.service:
+    name: transmission-daemon
+    state: restarted
+    daemon_reload: true
+
+- name: nginx changes
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
