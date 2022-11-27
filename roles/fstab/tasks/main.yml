@@ -54,4 +54,3 @@
   loop: "{{ lookup('ansible.builtin.dict', mountpoints) }}"
   notify:
     - snapper changes
-    
