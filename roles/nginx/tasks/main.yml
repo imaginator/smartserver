@@ -1,0 +1,17 @@
+---
+- name: install nginx
+  ansible.builtin.package:
+    name:
+      - nginx-full
+      - certbot
+      # needed for htpasswd -c /etc/nginx/htpasswd simon
+      - apache2-utils
+    state: present
+
+# Create a unique 2048 Diffie Hellman group
+# can take a while...
+# https://weakdh.org
+- name: generate dhparam pem
+  ansible.builtin.command: openssl dhparam -out /etc/nginx/dhparam.pem 2048
+  args:
+    creates: /etc/nginx/dhparam.pem
