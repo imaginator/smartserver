@@ -1,0 +1,24 @@
+---
+- name: ensure group " {{ group.name }} " exists
+  ansible.builtin.group:
+    name: "{{group.name}}"
+    gid: "{{group.id | default(omit)}}"
+    system: "{{group.system | default(omit)}}"
+    state: present
+  register: group_result
+
+- name: ensure user " {{ user.name }} " exists
+  ansible.builtin.group:
+    name: "{{user.name}}"
+    group: "{{group.name}}"
+    uid: "{{user.id | default(omit)}}"
+    system: "{{user.system | default(omit)}}"
+    home: "{{user.home | default(omit)}}"
+    shell: "/bin/false"
+    create_home: false
+  register: user_result
+
+- name: register uid & gid
+  ansible.builtin.set_fact:
+    system_users: "{{ system_users | combine( { user.key | default(user.name): { 'name': user.name, 'id': user_result['uid'] } } ) }}"
+    system_groups: "{{ system_groups | combine( { group.key | default(group.name): { 'name': group.name, 'id': group_result['gid'] }} ) }}"
