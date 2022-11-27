@@ -1,0 +1,14 @@
+- name: restart mysql
+  ansible.builtin.systemd:
+    name: mariadb
+    state: restarted
+  when: mysql_service_state != 'stopped'
+
+- name: upgrade schemas
+  ansible.builtin.command: >
+    mysql_upgrade -u "{{ mysql_root_user }}" -p"{{ mysql_root_password }}"
+  when:
+    - "installed_mariadb.stdout == 'Status: install ok installed'"
+  no_log: true
+  register: upgrade
+  failed_when: "upgrade.rc != 0 and upgrade.rc != 2"

@@ -1,0 +1,9 @@
+[client]
+
+[mysqld]
+bind-address  = 127.0.0.1
+socket = /run/mysqld/mysqld.sock
+
+# Import all .cnf files from configuration directory
+!includedir /etc/mysql/conf.d/
+!includedir /etc/mysql/mariadb.conf.d/
