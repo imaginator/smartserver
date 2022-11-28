@@ -16,10 +16,13 @@
     group: homeassistant
     system: true
     home: /var/lib/homeassistant
-    groups: media
+    groups:
+      - media
+      - dialout
     createhome: true
     shell: /bin/false
     state: present
+  notify: homeassistant changes
 
 - name: creates homeassistant directories
   ansible.builtin.file:
