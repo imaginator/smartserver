@@ -1,4 +1,4 @@
-- name: MySQL - Install MySQL packages
+- name: MySQL Install MySQL packages
   ansible.builtin.package:
     name:
       - mariadb-client
