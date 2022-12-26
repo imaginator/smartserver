@@ -1,0 +1,14 @@
+[Unit]
+Description=Transmission BitTorrent Daemon
+After=network.target
+
+[Service]
+User=debian-transmission
+Type=notify
+ExecStart=/usr/bin/transmission-daemon -f --log-info -I 2001:bf7:830:b000::3 -i 10.36.189.3  --config-dir /etc/transmission-daemon
+ExecStop=/bin/kill -s STOP $MAINPID
+ExecReload=/bin/kill -s HUP $MAINPID
+RestrictNetworkInterfaces=eno1.40 lo
+
+[Install]
+WantedBy=multi-user.target

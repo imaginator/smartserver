@@ -7,7 +7,7 @@
 
 - name: adding transmission-daemon to group media
   ansible.builtin.user:
-    name: transmission-daemon
+    name: debian-transmission
     groups: media
     append: true
 
@@ -30,3 +30,29 @@
     mode: 0660
   notify:
     - reload nginx
+
+- name: Create transmission service
+  ansible.builtin.template:
+    src: transmission.service
+    dest: /lib/systemd/system/transmission-daemon.service
+    owner: www-data
+    group: www-data
+    mode: 0660
+  notify:
+    - transmission changes
+
+- name: rmem_max
+  ansible.posix.sysctl:
+    name: net.core.rmem_max
+    value: '16777216'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: wmem_max
+  ansible.posix.sysctl:
+    name: net.core.wmem_max
+    value: '4194304'
+    sysctl_set: true
+    state: present
+    reload: true
