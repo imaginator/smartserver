@@ -1,0 +1,30 @@
+[Unit]
+Description=pigallery2
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+TimeoutStopSec=70
+User=pigallery2
+Group=pigallery2
+Restart=on-failure
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman container run \
+  --network=host \
+  --sdnotify=conmon \
+  --name pigallery2 \
+  --publish 3123:3123 \
+  --env Server-port=3123 \
+  --env NODE_ENV=production \
+  --volume /var/lib/podman-services/pigallery2/config:/app/data/config \
+  --volume /var/lib/podman-services/pigallery2/db:/app/data/db \
+  --volume /var/lib/podman-services/pigallery2/tmp:/app/data/tmp \
+  --volume /srv/photos/originals:/app/data/images:ro \
+  docker.io/bpatrik/pigallery2:latest
+ExecStop=/usr/bin/podman stop -t 30 pigallery2
+ExecStopPost=-/usr/bin/podman rm --ignore -f pigallery2
+
+[Install]
+WantedBy=default.target

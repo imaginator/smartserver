@@ -1,0 +1,11 @@
+---
+- name: pigallery2 changes
+  ansible.builtin.service:
+    name: pigallery2
+    state: restarted
+    daemon_reload: true
+
+- name: nginx changes
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded

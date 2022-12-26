@@ -1,0 +1,62 @@
+- name: create pigallery2 group
+  ansible.builtin.group:
+    name: pigallery2
+    state: present
+
+- name: create pigallery2 user
+  ansible.builtin.user:
+    name: pigallery2
+    group: pigallery2
+    system: true
+    home: /var/lib/pigallery2
+    groups:
+      - media
+      - dialout
+    createhome: false
+    shell: /bin/false
+    state: present
+  notify: pigallery2 changes
+
+- name: creates pigallery2 directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: pigallery2
+    group: pigallery2
+    mode: 0775
+  with_items:
+    - /var/lib/pigallery2
+    - /var/lib/podman-services/pigallery2/config
+    - /var/lib/podman-services/pigallery2/db
+    - /var/lib/podman-services/pigallery2/tmp
+
+- name: Create a new database
+  community.mysql.mysql_db:
+    name: pigallery2
+    state: present
+
+- name: create database user
+  community.mysql.mysql_user:
+    name: pigallery2-db-user
+    password: pigallery2
+    priv: "pigallery2.*:ALL"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create systemd service file
+  ansible.builtin.template:
+    src: pigallery2.service
+    dest: /lib/systemd/system/pigallery2.service
+    owner: root
+    group: root
+    mode: 0664
+  notify: pigallery2 changes
+
+- name: Create pigallery2.imagilan nginx vhost
+  ansible.builtin.template:
+    src: pigallery2.imagilan.conf
+    dest: /etc/nginx/sites-enabled/pigallery2.imagilan.conf
+    owner: www-data
+    group: www-data
+    mode: 0660
+  notify: nginx changes
