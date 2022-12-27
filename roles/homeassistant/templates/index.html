@@ -10,22 +10,23 @@
             margin: 0;
         }
 
-        .bgimg-1 {
+        #random_resized_image {
             position: relative;
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
-            background-image: url("http://pigallery2.imagilan/api/gallery/random/%7B%22type%22:1,%22list%22:[%7B%22type%22:14,%22text%22:%22%22,%22value%22:1%7D,%7B%22type%22:17,%22text%22:%22%22,%22landscape%22:true%7D]%7D");
             height: 100%;
         }
     </style>
+
 </head>
 
 <body>
-
-    <div class="bgimg-1">
+    <div id="random_resized_image">
     </div>
-
 </body>
+<script>
+    document.getElementById("random_resized_image").style.backgroundImage = "url(http://ha.imagilan/random_resized_image/" + window.innerWidth + "/%7B%22type%22:1,%22list%22:[%7B%22type%22:14,%22text%22:%22%22,%22value%22:1%7D,%7B%22type%22:17,%22text%22:%22%22,%22landscape%22:true%7D]%7D)";
+</script>
 
 </html>
