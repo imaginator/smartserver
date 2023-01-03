@@ -30,7 +30,7 @@
     // to negate options in pigallery2 use a "!" after the item in the UI
     // e.g: person!:(Susanne Pickel) and person!:(Kristin Karu) and orientation:landscape and min-resolution:13
     const rootUrl = 'http://ha.imagilan/random_resized_image';
-    const pictureQuery = encodeURIComponent('{"type":1,"list":[{"type":105,"text":"Susanne Pickel","negate":true,"matchType":1},{"type":105,"text":"Kristin Karu","negate":true,"matchType":1},{"type":17,"landscape":true},{"type":14,"value":14}]}');
+    const pictureQuery = encodeURIComponent('{"type":1,"list":[{"type":105,"text":"Susanne Pickel","negate":true,"matchType":1},{"type":105,"text":"Kristin Karu","negate":true,"matchType":1},{"type":17,"landscape":true},{"type":14,"value":10},{"type":104,"value":"intimate","negate":true}]}');
     const randomImage = document.getElementById("random_resized_image");
     randomImage.style.backgroundImage = `url(${rootUrl}/${window.innerWidth}/${pictureQuery})`;
 </script>
