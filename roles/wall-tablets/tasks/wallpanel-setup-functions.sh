@@ -1,41 +1,16 @@
 #!/bin/bash
-set -x
-wallpanel_version="0.10.5 Build 0"
-room=$1
 
-if [[ $(echo "$room" | grep -LE 'kitchen|lounge|study|hallwaylarge|bathroommain|bathroomguest|bedroom1|bedroom2|bedroom3') ]]; then
-  echo "Missing room parameter"
-  exit 1
-fi
-
-echo "Deploying to $room"
-echo "running ADB non-root commands"
-adb kill-server
-adb connect tablet-$room.imagilan:5555 && sleep 2
-
-install_wallpanel_app
-set_system_settings
-
-adb root && adb connect tablet-$room.imagilan:5555 && sleep 2
-
-set_wallpanel_settings
-disable_lock_screen
-remove_unneeded_apps
-
-adb unroot && sleep 5
-
-set_wallpanel_as_launcher
-
-echo "all done, rebooting..."
-adb reboot &
-adb disconnect tablet-$room.imagilan
+function get_a_room() {
+  room=$1
+  if [[ $(echo "$room" | grep -LE 'kitchen|lounge|study|hallwaylarge|bathroommain|bathroomguest|bedroom1|bedroom2|bedroom3') ]]; then
+    echo "Missing room parameter"
+    exit 1
+  fi
+  echo "Deploying to $room"
+}
 
 function install_wallpanel_app {
-
-  if [[ ! -f /tmp/WallPanelApp-prod-universal-release.apk ]]; then
-    curl -L -o /tmp/WallPanelApp-prod-universal-release.apk https://github.com/TheTimeWalker/wallpanel-android/releases/download/v0.10.5/WallPanelApp-prod-universal-release.apk
-  fi
-
+  echo "checking wallpanel versions"
   wallpanel_installed_version=$(adb shell dumpsys package xyz.wallpanel.app | grep versionName | awk -F"=" '{print $2}')
   echo "installed version: $wallpanel_installed_version"
   echo "desired version: $wallpanel_version"
@@ -44,13 +19,16 @@ function install_wallpanel_app {
     echo "correct version installed"
   else
     echo "installing correct version"
+    if [[ ! -f /tmp/WallPanelApp-prod-universal-release.apk ]]; then
+      echo "downloading correct version"
+      curl -L -o /tmp/WallPanelApp-prod-universal-release.apk https://github.com/TheTimeWalker/wallpanel-android/releases/download/v0.10.5/WallPanelApp-prod-universal-release.apk
+    fi
     adb install -r /tmp/WallPanelApp-prod-universal-release.apk
   fi
-  adb shell dumpsys deviceidle whitelist +xyz.wallpanel.app  # magical wakelock powers
-
 }
 
 function set_system_settings {
+  echo "installing system settings"
   # for finding settings:
   # adb shell settings list system
   # adb shell settings list global
@@ -80,8 +58,8 @@ function set_system_settings {
 
   # system prefs
   adb shell settings put system accelerometer_rotation 1
-  adb shell settings put system screen_brightness_mode 1 # auto brightness mode (1=automatic)
-  adb shell settings put system screen_off_timeout 30000 # in milliseconds
+  adb shell settings put system screen_brightness_mode 1   # auto brightness mode (1=automatic)
+  adb shell settings put system screen_off_timeout 30000   # in milliseconds
   adb shell settings put system volume_system 0
 
   # https://android.googlesource.com/platform/frameworks/base/+/master/cmds/svc/src/com/android/commands/svc/PowerCommand.java#46
@@ -89,17 +67,22 @@ function set_system_settings {
   adb shell svc wifi enable
 }
 
-function set_wallpanel_settings {
+function set_wallpanel_settings() {
+  echo "installing wallpanel settings"
   # need root to write to /data
+  room=$1
+  echo $room
   echo "adding wallpanel prefs"
   adb shell am force-stop xyz.wallpanel.app # before updating prefs / since disable doesn't kill
   envsubst '$room' <../templates/xyz.wallpanel.app_preferences.xml >/tmp/xyz.wallpanel.app_preferences.xml
   adb shell mkdir -m 777 -p /data/data/xyz.wallpanel.app/shared_prefs
   adb push /tmp/xyz.wallpanel.app_preferences.xml /data/data/xyz.wallpanel.app/shared_prefs/xyz.wallpanel.app_preferences.xml
   adb shell chmod -R 777 /data/data/xyz.wallpanel.app/shared_prefs
+  adb shell dumpsys deviceidle whitelist +xyz.wallpanel.app # magical wakelock powers
 }
 
 function disable_lock_screen {
+  echo "disabling lock screen"
   # Disable lock screen
   adb shell /system/bin/sqlite3 /data/system/locksettings.db \"UPDATE locksettings SET value = \'1\' WHERE name = \'lockscreen.disabled\'\"
   adb shell /system/bin/sqlite3 /data/system/locksettings.db \"UPDATE locksettings SET value = \'0\' WHERE name = \'lockscreen.password_type\'\"
@@ -107,7 +90,7 @@ function disable_lock_screen {
 }
 
 function remove_unneeded_apps {
-  # remove cruft
+  echo "removing cruf"
   adb shell pm disable com.android.calculator2
   adb shell pm disable com.android.calendar
   adb shell pm disable com.android.camera2
@@ -135,6 +118,7 @@ function remove_unneeded_apps {
 }
 
 function set_wallpanel_as_launcher {
+  echo "setting wallpanel as launcher"
   # Dumps the information about every activity that is shown in the launcher (i.e., has the launcher intent).
   # adb shell "cmd package query-activities -a android.intent.action.MAIN -c android.intent.category.LAUNCHER"
   adb shell am start -n xyz.wallpanel.app/.ui.activities.BrowserActivityNative
