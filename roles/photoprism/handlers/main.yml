@@ -1,0 +1,11 @@
+---
+- name: photoprism changes
+  ansible.builtin.service:
+    name: photoprism
+    state: restarted
+    daemon_reload: true
+
+- name: nginx changes
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded

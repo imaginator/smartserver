@@ -1,0 +1,49 @@
+[Unit]
+Description=Photoprism
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+TimeoutStopSec=70
+User=photoprism
+Group=photoprism
+Restart=on-failure
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman container run \
+  --network=host \
+  --sdnotify=conmon \
+  --name photoprism \
+  --env PHOTOPRISM_ADMIN_PASSWORD=insecure \
+  --env PHOTOPRISM_DATABASE_DRIVER=mysql \
+  --env PHOTOPRISM_DATABASE_NAME=photoprism \
+  --env PHOTOPRISM_DATABASE_PASSWORD=photoprism \
+  --env PHOTOPRISM_DATABASE_SERVER=127.0.0.1:3306 \
+  --env PHOTOPRISM_DATABASE_USER=photoprism-db-user \
+  --env PHOTOPRISM_DETECT_NSFW=false \
+  --env PHOTOPRISM_EXPERIMENTAL=false \
+  --env PHOTOPRISM_HTTP_HOST=0.0.0.0 \
+  --env PHOTOPRISM_HTTP_PORT=2342 \
+  --env PHOTOPRISM_ORIGINALS_PATH=/photoprism/originals \
+  --env PHOTOPRISM_PUBLIC=true \
+  --env PHOTOPRISM_READONLY=true \
+  --env PHOTOPRISM_SETTINGS_HIDDEN=false \
+  --env PHOTOPRISM_SIDECAR_JSON=true \
+  --env PHOTOPRISM_SIDECAR_YAML=true \
+  --env PHOTOPRISM_SITE_AUTHOR="Simon Tennant" \
+  --env PHOTOPRISM_SITE_CAPTION="imagiPhoto" \
+  --env PHOTOPRISM_SITE_DESCRIPTION="Nothing" \
+  --env PHOTOPRISM_SITE_TITLE="My Photobook" \
+  --env PHOTOPRISM_SITE_URL=http://photos.imagilan/ \
+  --env PHOTOPRISM_UPLOAD_NSFW=true \
+  --env PHOTOPRISM_THUMB_UNCACHED=true \
+  --publish 2342:2342 \
+  --volume /srv/photos/originals:/photoprism/originals:ro \
+  --volume /var/lib/podman-services/photoprism:/photoprism/storage \
+  docker.io/photoprism/photoprism
+ExecStop=/usr/bin/podman stop -t 10 photoprism
+ExecStopPost=-/usr/bin/podman rm --ignore -f photoprism
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,60 @@
+- name: create photoprism group
+  ansible.builtin.group:
+    name: photoprism
+    state: present
+
+- name: create photoprism user
+  ansible.builtin.user:
+    name: photoprism
+    group: photoprism
+    system: true
+    home: /var/lib/photoprism
+    groups:
+      - media
+      - dialout
+    createhome: false
+    shell: /bin/false
+    state: present
+  notify: photoprism changes
+
+- name: creates photoprism directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: photoprism
+    group: photoprism
+    mode: 0775
+  with_items:
+    - /var/lib/photoprism
+    - /var/lib/podman-services/photoprism
+
+- name: Create a new database
+  community.mysql.mysql_db:
+    name: photoprism
+    state: present
+
+- name: create database user
+  community.mysql.mysql_user:
+    name: photoprism-db-user
+    password: photoprism
+    priv: "photoprism.*:ALL"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create systemd service file
+  ansible.builtin.template:
+    src: photoprism.service
+    dest: /lib/systemd/system/photoprism.service
+    owner: root
+    group: root
+    mode: 0664
+  notify: photoprism changes
+
+- name: Create photos.imagilan nginx vhost
+  ansible.builtin.template:
+    src: photos.imagilan.conf
+    dest: /etc/nginx/sites-enabled/photos.imagilan.conf
+    owner: www-data
+    group: www-data
+    mode: 0660
+  notify: nginx changes
