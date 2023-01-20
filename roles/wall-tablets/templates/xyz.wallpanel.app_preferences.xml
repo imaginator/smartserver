@@ -9,12 +9,11 @@
     <boolean name="pref_dark_theme" value="true" />
     <boolean name="pref_setting_camera_enabled" value="false" />
     <boolean name="pref_settings_button_disable" value="false" />
-    <boolean name="pref_settings_button_transparent" value="false" />
+    <boolean name="pref_settings_button_transparent" value="true" />
     <boolean name="pref_settings_disable" value="false" />
     <boolean name="pref_settings_fullscreen" value="true" />
     <boolean name="pref_settings_refresh_on_disconnect" value="true" />
     <boolean name="pref_settings_theme" value="true" />
-    <boolean name="pref_settings_transparent" value="false" />
     <boolean name="pref_use_screen_brightness" value="true" />
     <boolean name="pref_web_screensaver" value="true" />
     <boolean name="pref_write_screen_permissions" value="true" />
@@ -39,7 +38,6 @@
     <string name="pref_mqtt_version">5.0</string>
     <string name="pref_screensaver_dim_value">99</string>
     <string name="pref_screensaver_inactivity_time">15000</string>
-    <string name="pref_setting_camera_rotate">0F</string>
     <string name="pref_settings_button_location">0</string>
     <string name="pref_settings_dashboard_url">http://ha.imagilan/</string>
     <string name="pref_settings_image_rotation">15</string>
