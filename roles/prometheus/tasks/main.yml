@@ -1,0 +1,25 @@
+- name: install prometheus server
+  ansible.builtin.package:
+    name:
+      - prometheus
+    state: present
+
+- name: prometheus runtime settings
+  ansible.builtin.template:
+    src: etc_default_prometheus
+    dest: /etc/default/prometheus
+    owner: prometheus
+    group: prometheus
+    mode: 0660
+  notify:
+    - restart prometheus
+
+- name: prometheus config
+  ansible.builtin.template:
+    src: prometheus.yaml
+    dest: /etc/prometheus/prometheus.yml
+    owner: prometheus
+    group: prometheus
+    mode: 0660
+  notify:
+    - restart prometheus
