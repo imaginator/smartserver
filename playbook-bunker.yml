@@ -14,3 +14,6 @@
     - { name: transmission, ansible.builtin.import_role: { name: transmission }, tags: ['transmission'] }
     - { name: plex, ansible.builtin.import_role: { name: plex }, tags: ['plex'] }
     - { name: homeassistant, ansible.builtin.import_role: { name: homeassistant }, tags: ['homeassistant'] }
+    - { name: photoprism, ansible.builtin.import_role: { name: photoprism }, tags: ['photoprism'] }
+    - { name: pigallery2, ansible.builtin.import_role: { name: pigallery2 }, tags: ['pigallery2'] }
+    - { name: prometheus, ansible.builtin.import_role: { name: prometheus }, tags: ['prometheus'] }
