@@ -17,7 +17,7 @@ ExecStart=/usr/bin/podman container run \
   --name pigallery2 \
   --publish 3123:3123 \
   --env Server-port=3123 \
-  --env NODE_ENV=production \
+  --env NODE_ENV=debug \
   --volume /var/lib/podman-services/pigallery2/config:/app/data/config \
   --volume /var/lib/podman-services/pigallery2/db:/app/data/db \
   --volume /var/lib/podman-services/pigallery2/tmp:/app/data/tmp \

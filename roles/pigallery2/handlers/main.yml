@@ -3,6 +3,7 @@
   ansible.builtin.service:
     name: pigallery2
     state: restarted
+    enabled: true
     daemon_reload: true
 
 - name: nginx changes
