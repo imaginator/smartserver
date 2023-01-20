@@ -19,6 +19,7 @@ ExecStart=/usr/bin/podman run \
   --volume /srv/video/Film:/media/film:ro \
   --volume /srv/audio/audiobooks/:/media/audiobooks:ro \
   --volume /srv/photos/:/media/photos:ro \
+  --volume /srv/audio/music/Music/:/media/music:ro \
   --volume /var/lib/plex/data:/data \
   --volume /var/lib/plex/database:/config \
   --volume /var/tmp/plex/transcode:/transcode \
