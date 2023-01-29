@@ -13,7 +13,7 @@ so that grub looks like
  setparams 'Try or Install Ubuntu Server'                                       
                                                                                 
          set gfxpayload=keep                                                    
-         linux        /casper/vmlinuz console=tty0 console=ttyS1,115200 ---     
+         linux        /casper/vmlinuz console=tty0 console=ttyS0,115200 ---     
          initrd        /casper/initrd                                           
                                                                                 
                                                                                 
