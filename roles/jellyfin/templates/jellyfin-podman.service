@@ -1,0 +1,31 @@
+[Unit]
+Description=jellyfin in Podman                                                                            
+Documentation=man:podman-generate-systemd(1)                                                                          
+Wants=network-online.target                                                                                           
+After=network-online.target                                                                                           
+
+[Service]
+Restart=on-failure
+TimeoutStopSec=70
+User=jellyfin
+Group=jellyfin
+ExecStart=/usr/bin/podman run \
+  --label "io.containers.autoupdate=registry" \
+  --name=jellyfin \
+  --publish 8096:8096/tcp \
+  --sdnotify=conmon \
+  -e TZ=Europe/Berlin \
+  --userns keep-id \
+  --volume /var/lib/jellyfin/config:/config:Z \
+  --volume /var/tmp/jellyfin/cache:/cache:Z \
+  --volume /srv/video/TV:/media/tv:ro \
+  --volume /srv/video/Film:/media/film:ro \
+  --volume /srv/audio/audiobooks/:/media/audiobooks:ro \
+  --volume /srv/photos/:/media/photos:ro \
+  --volume /srv/audio/music/Music/:/media/music:ro \
+  docker.io/jellyfin/jellyfin:latest
+ExecStop=/usr/bin/podman stop -t 10 jellyfin
+ExecStopPost=-/usr/bin/podman rm --ignore -f jellyfin
+
+[Install]
+WantedBy=default.target

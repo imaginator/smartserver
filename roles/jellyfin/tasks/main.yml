@@ -1,27 +1,63 @@
 ---
-- name: Install Jellyfin
-  include_tasks: install.yml
+# only accessible via jellyfin.imaginator.com
+# https://github.com/toomuchio/jellyfin-nginx-reverseproxy
 
-- name: Generate self signed SSL certificate
-  include_role:
-    name: hadrienpatte.self_signed_certificate
-  vars:
-    self_signed_certificate_FQDN: "{{ jellyfin_FQDN }}"
-    self_signed_certificate_key_path: "{{ jellyfin_certificate_path }}"
-    self_signed_certificate_path: "{{ jellyfin_certificate_path }}"
-  when: jellyfin_generate_self_signed_certificate
+- name: Install packages
+  ansible.builtin.package:
+    name:
+      - podman
+    state: present
 
-- name: Configure {{ jellyfin_HTTP_server }}
-  include_tasks: HTTP_server.yml
+- name: create jellyfin group
+  ansible.builtin.group:
+    name: jellyfin
+    state: present
 
-- name: Install and configure certbot
-  include_tasks: certbot.yml
-  when: jellyfin_letsencrypt
+- name: ensure media group exists
+  ansible.builtin.group:
+    name: media
+    state: present
 
-- name: Reconfigure {{ jellyfin_HTTP_server }}
-  include_tasks: HTTP_server.yml
-  when: jellyfin_letsencrypt
+- name: create jellyfin user
+  ansible.builtin.user:
+    name: jellyfin
+    group: jellyfin
+    system: true
+    home: /var/lib/jellyfin
+    groups: media
+    createhome: true
+    shell: /bin/false
+    state: present
 
-- name: Configure Jellyfin
-  include_tasks: configure.yml
-...
+- name: creates jellyfin directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: jellyfin
+    group: jellyfin
+    mode: 0775
+  with_items:
+    - /var/lib/jellyfin/config
+    - /var/tmp/jellyfin/cache
+
+# needs /etc/sub[ug]id of
+# simon:100000:65536
+# jellyfin:165536:65536
+
+- name: Create jellyfin-podman systemd service file
+  ansible.builtin.template:
+    src: jellyfin-podman.service
+    dest: /lib/systemd/system/jellyfin-podman.service
+    owner: root
+    group: root
+    mode: 0664
+  notify: restart jellyfin-podman
+
+- name: Create jellyfin-podman nginx vhost
+  ansible.builtin.template:
+    src: jellyfin.imaginator.com.conf
+    dest: /etc/nginx/sites-enabled/jellyfin.imaginator.com.conf
+    owner: www-data
+    group: www-data
+    mode: 0660
+  notify: reload nginx
